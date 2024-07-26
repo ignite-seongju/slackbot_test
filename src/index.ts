@@ -1,4 +1,9 @@
-import { App, BlockAction, ExpressReceiver } from '@slack/bolt';
+import {
+  App,
+  BlockAction,
+  ExpressReceiver,
+  AwsLambdaReceiver,
+} from '@slack/bolt';
 
 import dotenv from 'dotenv';
 import {
@@ -9,14 +14,14 @@ import {
 
 dotenv.config();
 
-const receiver = new ExpressReceiver({
+const awsLambdaReceiver = new AwsLambdaReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET || '',
 });
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN || '',
   signingSecret: process.env.SLACK_SIGNING_SECRET || '',
-  receiver,
+  receiver: awsLambdaReceiver,
 });
 
 let commandUserId = '';
@@ -129,7 +134,12 @@ app.action<BlockAction>('cpo_bo_url_list', async ({ ack, respond }) => {
   });
 });
 
-(async () => {
-  await app.start(process.env.PORT || 3086);
-  console.log('⚡️ Bolt app is running!');
-})();
+module.exports.handler = async (event: any, context: any, callback: any) => {
+  const handler = await awsLambdaReceiver.start();
+  return handler(event, context, callback);
+};
+
+// (async () => {
+//   await app.start(process.env.PORT || 3086);
+//   console.log('⚡️ Bolt app is running!');
+// })();
