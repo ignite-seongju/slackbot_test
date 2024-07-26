@@ -2,7 +2,7 @@
   "name": "slackbot_test",
   "version": "0.1.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm",
