@@ -1,11 +1,16 @@
 service: fe1-slackbot
-frameworkVersion: '3'
+frameworkVersion: '4'
+
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
+  region: ap-northeast-2 # 원하는 리전으로 변경
+  stage: prod # 기본 stage를 "prod"로 설정
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    GITHUB_TOKEN: ${env:GITHUB_TOKEN}
+
 functions:
   slack:
     handler: app.handler
@@ -13,5 +18,18 @@ functions:
       - http:
           path: slack/events
           method: post
+
 plugins:
   - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3086
+
+package:
+  include:
+    - app.js
+  exclude:
+    - node_modules/**
+    - src/**
+    - ./**

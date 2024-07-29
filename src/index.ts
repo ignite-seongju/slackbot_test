@@ -1,15 +1,17 @@
-import { App, BlockAction, ExpressReceiver } from '@slack/bolt';
+import { App, AwsLambdaReceiver } from '@slack/bolt';
 
 import dotenv from 'dotenv';
 import {
+  handleConfirmPRReview,
   handleRequestPRReview,
+  handleGetURLs,
   handleSelectPRReviewProject,
   handleSelectURLListProject,
 } from './handler';
 
 dotenv.config();
 
-const receiver = new ExpressReceiver({
+const receiver = new AwsLambdaReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET || '',
 });
 
@@ -19,26 +21,22 @@ const app = new App({
   receiver,
 });
 
-// Express 인스턴스를 가져와서 '/' 경로에 대한 GET 요청 처리기 추가
-const expressApp = receiver.app;
-
-expressApp.get('/', (req, res) => {
-  res.send('Deployment successful!');
-});
-
 let commandUserId = '';
 
-app.command('/fe1-beta', async ({ command, ack, respond, say, client }) => {
-  await ack();
-  commandUserId = command.user_id;
+export const getUserId = () => {
+  return commandUserId;
+};
 
+app.command('/fe1-bot', async ({ command, ack, respond, say, client }) => {
+  commandUserId = command.user_id;
+  await ack();
   await respond({
     blocks: [
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: '*어떤 작업이 필요하세요?*',
+          text: `${command.user_name}님 반갑습니다!\n어떤 작업을 도와드릴까요? 아직은 할 수 있는게 많지 않아요. 🙂`,
         },
       },
       {
@@ -48,7 +46,7 @@ app.command('/fe1-beta', async ({ command, ack, respond, say, client }) => {
             type: 'button',
             text: {
               type: 'plain_text',
-              text: 'PR 검토 요청',
+              text: '내 최신 PR 검토 요청하기',
               emoji: true,
             },
             value: 'pr_review',
@@ -58,41 +56,11 @@ app.command('/fe1-beta', async ({ command, ack, respond, say, client }) => {
             type: 'button',
             text: {
               type: 'plain_text',
-              text: '프로젝트 관련 URL 목록 보기',
+              text: '페이지 목록 보기',
               emoji: true,
             },
             value: 'url_list',
             action_id: 'url_list',
-          },
-          {
-            type: 'button',
-            text: {
-              type: 'plain_text',
-              text: '작업 Flow 보기 (coming soon)',
-              emoji: true,
-            },
-            value: 'work_flow',
-            action_id: 'work_flow',
-          },
-          {
-            type: 'button',
-            text: {
-              type: 'plain_text',
-              text: '배포 Flow 보기 (coming soon)',
-              emoji: true,
-            },
-            value: 'deploy_flow',
-            action_id: 'deploy_flow',
-          },
-          {
-            type: 'button',
-            text: {
-              type: 'plain_text',
-              text: '다른 유용한 기능들 (coming soon)',
-              emoji: true,
-            },
-            value: 'coming_soon',
-            action_id: 'coming_soon',
           },
         ],
       },
@@ -101,42 +69,21 @@ app.command('/fe1-beta', async ({ command, ack, respond, say, client }) => {
 });
 
 // PR 검토 요청 액션
-app.action<BlockAction>('pr_review', handleSelectPRReviewProject);
-app.action<BlockAction>(/^.*_pr_review$/, handleRequestPRReview);
+app.action('pr_review', handleSelectPRReviewProject);
+app.action(/^.*_pr_review$/, handleRequestPRReview);
+app.action('confirm_pr', handleConfirmPRReview);
 
-// 프로젝트 URL 목록 액션
-app.action<BlockAction>('url_list', handleSelectURLListProject);
-
-app.action<BlockAction>('cpo_bo_url_list', async ({ ack, respond }) => {
+app.action('reject_pr', async ({ ack, respond }) => {
   await ack();
-  await respond({
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*CPO BO 프로젝트 URL 목록*',
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `1. <https://cpo.bo.com|CPO BO>`,
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `1. <https://cpo.bo.com|CPO BO>`,
-        },
-      },
-    ],
-  });
+  await respond('PR 요청이 취소되었습니다.');
 });
 
-(async () => {
-  await app.start(process.env.PORT || 3000);
-  console.log('⚡️ Bolt app is running!');
-})();
+// URL 목록 받기 액션
+app.action('url_list', handleSelectURLListProject);
+app.action(/^.*_url_list$/, handleGetURLs);
+
+// Handle the Lambda function event
+export const handler = async (event: any, context: any, callback: any) => {
+  const handler = await receiver.start();
+  return handler(event, context, callback);
+};
