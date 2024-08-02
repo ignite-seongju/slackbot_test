@@ -83,16 +83,15 @@ export const handleRequestPRReview: Middleware<
 
   const projectId = (body.actions[0] as { value: keyof typeof projectMap })
     .value;
-  const targetGroupId =
-    USER_GROUP_IDS.find((id) => {
-      if (['kia-cpo-bo-web', 'hmg-groupware-bo-web'].includes(projectId)) {
-        return id.name === 'fe1';
-      }
+  const targetGroup = USER_GROUP_IDS.find((id) => {
+    if (['kia-cpo-bo-web', 'hmg-groupware-bo-web'].includes(projectId)) {
+      return id.name === 'fe1';
+    }
 
-      if (['hmg-developers'].includes(projectId)) {
-        return id.name === 'fe-hmgdev';
-      }
-    })?.id || '';
+    if (['hmg-developers'].includes(projectId)) {
+      return id.name === 'fe-hmgdev';
+    }
+  }) || { id: '', name: '' };
 
   if (['kia-cpo-bo-web', 'hmg-groupware-bo-web'].includes(projectId)) {
     const res = await getLatestGitHubPR(
@@ -117,7 +116,7 @@ export const handleRequestPRReview: Middleware<
       ? '시간되실 때 검토 부탁드립니다.'
       : '참고 부탁드립니다.';
 
-    const message = `<!subteam^${targetGroupId}|fe1> *[${projectName}] ${title}* <${html_url}|PR>입니다. \`${labelText}\`\n${additionalMessage} :blob_salute: (\`${head.ref}\` > \`${base.ref}\`)`;
+    const message = `<!subteam^${targetGroup.id}|${targetGroup.name}> *[${projectName}] ${title}* <${html_url}|PR>입니다. \`${labelText}\`\n${additionalMessage} :blob_salute: (\`${head.ref}\` > \`${base.ref}\`)`;
 
     await respond({
       blocks: [
@@ -194,9 +193,8 @@ export const handleConfirmPRReview: Middleware<
   await ack();
 
   const message = (body.actions[0] as { value: string }).value;
-
   await client.chat.postMessage({
-    channel: CHANNEL_IDS.find((id) => id.name === 'fe1-dm')?.id || '',
+    channel: CHANNEL_IDS.find((id) => id.name === 'fe-dm')?.id || '',
     text: message,
   });
 

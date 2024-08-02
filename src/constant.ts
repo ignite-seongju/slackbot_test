@@ -175,6 +175,11 @@ export const GROUPWARE_URLS: InputItem[] = [
     url: 'https://gitlab.hmc.co.kr/hmg-groupware/hmg-groupware-portal/assemble-fe',
   },
   {
+    type: 'Service',
+    name: 'Pinpoint',
+    url: 'https://pinpoint.hmg-corp.io/',
+  },
+  {
     type: 'Dooray',
     name: '3.9.2.4-차세대-그룹웨어-포털-Dev',
     url: 'https://hmg.dooray.com/task/3519486226737337967',
