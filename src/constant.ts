@@ -45,8 +45,18 @@ export const CPO_BO_URLS: InputItem[] = [
   },
   {
     type: 'Service',
-    name: 'Github',
-    url: 'https://github.com/ignite-corp/kia-cpo-bo-web',
+    name: 'Jira',
+    url: 'https://ignitecorp.atlassian.net/jira/software/c/projects/KQ/boards/20',
+  },
+  {
+    type: 'Service',
+    name: 'Gitlab',
+    url: 'https://gitlab.hmc.co.kr/kia-cpo/kia-cpo-bo-web',
+  },
+  {
+    type: 'Service',
+    name: 'BO 검증계',
+    url: 'https://stg-cpo.kia-corp.io/',
   },
   {
     type: 'Service',
@@ -91,7 +101,12 @@ export const CPO_BO_URLS: InputItem[] = [
   {
     type: 'Service',
     name: 'Sonarqube',
-    url: 'http://cpo-sonar.kia.co.kr/projects',
+    url: 'https://sonarqube.hmg-corp.io/projects',
+  },
+  {
+    type: 'Service',
+    name: 'Blackduck',
+    url: 'https://blackduck.hmg-corp.io/',
   },
   {
     type: 'Service',
@@ -110,6 +125,16 @@ export const HMG_DEV_URLS: InputItem[] = [
     type: 'Service',
     name: 'Gitlab',
     url: 'https://gitlab.hmc.co.kr/ignite-hmg-developers/hmg-developers',
+  },
+  {
+    type: 'Service',
+    name: 'Sonarqube',
+    url: 'https://sonarqube.hmg-corp.io/projects',
+  },
+  {
+    type: 'Service',
+    name: 'Blackduck',
+    url: 'https://blackduck.hmg-corp.io/',
   },
   {
     type: 'Swagger',

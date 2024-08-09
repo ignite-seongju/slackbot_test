@@ -42,26 +42,47 @@ app.command('/fe1-bot', async ({ command, ack, respond, say, client }) => {
       {
         type: 'actions',
         elements: [
+          // gitlab 이관되며 임시 deprecated
+          // {
+          //   type: 'button',
+          //   text: {
+          //     type: 'plain_text',
+          //     text: '내 최신 PR 검토 요청하기',
+          //     emoji: true,
+          //   },
+          //   value: 'pr_review',
+          //   action_id: 'pr_review',
+          // },
           {
             type: 'button',
             text: {
               type: 'plain_text',
-              text: '내 최신 PR 검토 요청하기',
-              emoji: true,
-            },
-            value: 'pr_review',
-            action_id: 'pr_review',
-          },
-          {
-            type: 'button',
-            text: {
-              type: 'plain_text',
-              text: '페이지 목록 보기',
+              text: '📕 페이지 목록',
               emoji: true,
             },
             value: 'url_list',
             action_id: 'url_list',
           },
+          // {
+          //   type: 'button',
+          //   text: {
+          //     type: 'plain_text',
+          //     text: '서비스 계정 목록',
+          //     emoji: true,
+          //   },
+          //   value: 'account_list',
+          //   action_id: 'account_list',
+          // },
+          // {
+          //   type: 'button',
+          //   text: {
+          //     type: 'plain_text',
+          //     text: '슬랙 템플릿 목록',
+          //     emoji: true,
+          //   },
+          //   value: 'slack_template',
+          //   action_id: 'slack_template',
+          // },
         ],
       },
     ],
@@ -72,15 +93,20 @@ app.command('/fe1-bot', async ({ command, ack, respond, say, client }) => {
 app.action('pr_review', handleSelectPRReviewProject);
 app.action(/^.*_pr_review$/, handleRequestPRReview);
 app.action('confirm_pr', handleConfirmPRReview);
-
 app.action('reject_pr', async ({ ack, respond }) => {
   await ack();
   await respond('PR 요청이 취소되었습니다.');
 });
 
-// URL 목록 받기 액션
+// 페이지 목록 액션
 app.action('url_list', handleSelectURLListProject);
 app.action(/^.*_url_list$/, handleGetURLs);
+
+// 계정 목록 액션
+app.action('account_list', async ({ ack, respond }) => {});
+
+// 슬랙 템플릿 목록 액션
+app.action('slack_template', async ({ ack, respond }) => {});
 
 // Handle the Lambda function event
 export const handler = async (event: any, context: any, callback: any) => {

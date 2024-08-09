@@ -124,7 +124,7 @@ export const handleRequestPRReview: Middleware<
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${title}* \`${labelText}\`\n\n 혹시 위 <${html_url}|PR>이 맞나요?\n\n '맞아요'를 선택하시면, fe1-dm 채널에 알림이 전달됩니다.`,
+            text: `*${title}* \`${labelText}\`\n\n 혹시 위 <${html_url}|PR>이 맞나요?\n\n '맞아요'를 선택하시면, fe-dm 채널에 알림이 전달됩니다.`,
           },
         },
         {
@@ -256,16 +256,6 @@ export const handleSelectURLListProject: Middleware<
             },
             value: 'hmg-groupware-bo-web',
             action_id: 'groupware_url_list',
-          },
-          {
-            type: 'button',
-            text: {
-              type: 'plain_text',
-              text: '기타',
-              emoji: true,
-            },
-            value: 'etc',
-            action_id: 'etc_url_list',
           },
         ],
       },
