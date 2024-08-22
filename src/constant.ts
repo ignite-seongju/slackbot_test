@@ -45,11 +45,6 @@ export const CPO_BO_URLS: InputItem[] = [
   },
   {
     type: 'Service',
-    name: 'Jira',
-    url: 'https://ignitecorp.atlassian.net/jira/software/c/projects/KQ/boards/20',
-  },
-  {
-    type: 'Service',
     name: 'Gitlab',
     url: 'https://gitlab.hmc.co.kr/kia-cpo/kia-cpo-bo-web',
   },
@@ -205,6 +200,21 @@ export const GROUPWARE_URLS: InputItem[] = [
     url: 'https://pinpoint.hmg-corp.io/',
   },
   {
+    type: 'Service',
+    name: '조직도(검증계)',
+    url: 'https://stg-orgchart.hmg-corp.io/',
+  },
+  {
+    type: 'Service',
+    name: '포탈(검증계)',
+    url: 'https://stg-assemble.hmg-corp.io/',
+  },
+  {
+    type: 'Service',
+    name: '어드민(검증계)',
+    url: 'https://stg-assemble-admin.hmg-corp.io/',
+  },
+  {
     type: 'Dooray',
     name: '3.9.2.4-차세대-그룹웨어-포털-Dev',
     url: 'https://hmg.dooray.com/task/3519486226737337967',
@@ -221,8 +231,18 @@ export const GROUPWARE_URLS: InputItem[] = [
   },
   {
     type: 'Confluence',
+    name: 'Dev FE) 프로젝트 정보',
+    url: 'https://ignitecorp.atlassian.net/wiki/spaces/HG/pages/865665053/Dev+FE',
+  },
+  {
+    type: 'Confluence',
     name: 'Dev FE) Phase, IA, 개발현황',
     url: 'https://ignitecorp.atlassian.net/wiki/spaces/HG/pages/813432866/Dev+FE+Phase+IA',
+  },
+  {
+    type: 'Confluence',
+    name: '그룹웨어 관련 URL 모음',
+    url: 'https://ignitecorp.atlassian.net/wiki/spaces/HG/pages/867008749/URL',
   },
   {
     type: 'Confluence',
@@ -238,6 +258,16 @@ export const GROUPWARE_URLS: InputItem[] = [
     type: 'Service',
     name: 'Sonarqube',
     url: 'https://sonarqube.hmg-corp.io/dashboard?id=D0754_hmg-groupware',
+  },
+  {
+    type: 'Figma 기획 FO',
+    name: '기획서 목록',
+    url: 'https://www.figma.com/files/1185437707337768374/project/83017790?fuid=1187576328528052434',
+  },
+  {
+    type: 'Figma 기획 FO',
+    name: 'FO 조직도',
+    url: 'https://www.figma.com/design/SbjbWGdiZkcJH682gFmczp/%5B%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4_%EA%B8%B0%ED%9A%8D%5D-FO_%EC%A1%B0%EC%A7%81%EB%8F%84?node-id=1154-5249&t=KSUw0zSYa8zjGGIF-0',
   },
   {
     type: 'Figma 기획 FO',
@@ -283,6 +313,11 @@ export const GROUPWARE_URLS: InputItem[] = [
     type: 'Figma 기획 FO',
     name: 'FO 업무시스템',
     url: 'https://www.figma.com/design/0dBcL1vZfsRplQMTv8wzpp/%5B%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4_%EA%B8%B0%ED%9A%8D%5D-FO_%EC%97%85%EB%AC%B4%EC%8B%9C%EC%8A%A4%ED%85%9C-%EB%AA%A9%EB%A1%9D?node-id=1-3&t=ivjQsfyca3eSfUgH-1',
+  },
+  {
+    type: 'Figma 기획 BO',
+    name: '기획서 목록',
+    url: 'https://www.figma.com/files/1185437707337768374/project/83017790?fuid=1187576328528052434',
   },
   {
     type: 'Figma 기획 BO',

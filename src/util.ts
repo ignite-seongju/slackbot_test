@@ -2,7 +2,7 @@ import { KnownBlock } from '@slack/bolt';
 import _ from 'lodash';
 import { InputItem } from './types';
 
-export const generateSlackBlocks = (input: InputItem[]): KnownBlock[] => {
+export const generateSlackLinkBlocks = (input: InputItem[]): KnownBlock[] => {
   const grouped = _.groupBy(input, 'type');
 
   const blocks: KnownBlock[] = [];

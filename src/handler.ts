@@ -5,7 +5,7 @@ import {
   SlackActionMiddlewareArgs,
 } from '@slack/bolt';
 import {
-  getLatestCPODeployPage,
+  getLatestCPODeployPages,
   getLatestGitHubPR,
   getLatestGitLabMR,
 } from './external';
@@ -16,7 +16,8 @@ import {
   HMG_DEV_URLS,
   USER_GROUP_IDS,
 } from './constant';
-import { generateSlackBlocks } from './util';
+import { generateSlackLinkBlocks } from './util';
+import { InputItem } from './types';
 
 export const handleSelectPRReviewProject: Middleware<
   SlackActionMiddlewareArgs<BlockAction>
@@ -281,21 +282,23 @@ export const handleGetURLs: Middleware<
 
   if (projectId === 'kia-cpo-bo-web') {
     const allUrls = [...CPO_BO_URLS];
-    const latestDeployPage = await getLatestCPODeployPage();
+    const latestDeployPages = await getLatestCPODeployPages();
 
-    if (latestDeployPage) {
-      allUrls.push({ type: 'Confluence', ...latestDeployPage });
+    if (latestDeployPages && Array.isArray(latestDeployPages)) {
+      latestDeployPages.forEach((page) => {
+        allUrls.push({ type: 'Confluence', ...page });
+      });
     }
 
-    slackBlocks = generateSlackBlocks(allUrls);
+    slackBlocks = generateSlackLinkBlocks(allUrls);
   }
 
   if (projectId === 'hmg-groupware-bo-web') {
-    slackBlocks = generateSlackBlocks(GROUPWARE_URLS);
+    slackBlocks = generateSlackLinkBlocks(GROUPWARE_URLS);
   }
 
   if (projectId === 'hmg-developers') {
-    slackBlocks = generateSlackBlocks(HMG_DEV_URLS);
+    slackBlocks = generateSlackLinkBlocks(HMG_DEV_URLS);
   }
 
   await respond({
@@ -305,6 +308,91 @@ export const handleGetURLs: Middleware<
         text: {
           type: 'mrkdwn',
           text: `*${projectName} 프로젝트* 관련 페이지들이예요. 🤖`,
+        },
+      },
+      ...slackBlocks,
+    ],
+  });
+};
+
+export const handleSelectSlackTemplate: Middleware<
+  SlackActionMiddlewareArgs<BlockAction>
+> = async ({ ack, respond }) => {
+  await ack();
+  await respond({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '*필요한 템플릿을 골라주세요.*',
+        },
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'CPO BO 정기배포/핫픽스',
+              emoji: true,
+            },
+            value: 'cpo_bo_deploy',
+            action_id: 'cpo_bo_deploy',
+          },
+        ],
+      },
+    ],
+  });
+};
+
+export const handleGetSlackTemplate: Middleware<
+  SlackActionMiddlewareArgs<BlockAction>
+> = async ({ ack, body, client, say, respond }) => {
+  await ack();
+
+  let templateTitle = '';
+
+  if ((body.actions[0] as { value: string }).value === 'cpo_bo_deploy') {
+    templateTitle = 'CPO BO 정기배포/핫픽스';
+  }
+
+  const recentReleaseNotes: InputItem[] = [];
+
+  const latestDeployPages = await getLatestCPODeployPages();
+  if (latestDeployPages && Array.isArray(latestDeployPages)) {
+    latestDeployPages.forEach((page) => {
+      recentReleaseNotes.push({ type: 'Confluence', ...page });
+    });
+  }
+  const slackBlocks = generateSlackLinkBlocks(recentReleaseNotes);
+
+  await respond({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*${templateTitle}* 템플릿이예요. 🤖`,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '<  *Gitlab*  >\n1. release -> main 머지 <https://gitlab.hmc.co.kr/kia-cpo/kia-cpo-bo-web/-/merge_requests|BO> / <https://gitlab.hmc.co.kr/kia-cpo/kia-pricing-bo-web/-/merge_requests|프라이싱> / <https://gitlab.hmc.co.kr/kia-cpo/kia-cpo-partner-web/-/merge_requests|평가사>\n\t a. 릴리즈 발행 (`{릴리즈 버전 작성 ex) v1.21}`) - <@U04D5SP327J>\n\t\ti. 릴리즈 노트: `{릴리즈 노트 링크 작성}`\n2. main 로컬구동 모니터링 - <!subteam^S06J9P5HQ2U>\n3. 운영 배포 trigger - <@U04D5SP327J>\n4. main -> stage, stage2 현행화/배포\n\ta. BO `{담당자 태그}`\n\tb. 프라이싱 `{담당자 태그}`\n\tc. 평가사 `{담당자 태그}`\n5. 배포 후 모니터링<!subteam^S06J9P5HQ2U>\n\ta. 순서: `{모니터링 순서 작성}`',
+        },
+      },
+      { type: 'divider' },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '참고) 최신 릴리즈 노트 목록입니다. :memo:',
         },
       },
       ...slackBlocks,

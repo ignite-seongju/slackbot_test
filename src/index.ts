@@ -7,6 +7,8 @@ import {
   handleGetURLs,
   handleSelectPRReviewProject,
   handleSelectURLListProject,
+  handleSelectSlackTemplate,
+  handleGetSlackTemplate,
 } from './handler';
 
 dotenv.config();
@@ -27,7 +29,7 @@ export const getUserId = () => {
   return commandUserId;
 };
 
-app.command('/fe1-bot', async ({ command, ack, respond, say, client }) => {
+app.command('/bot-fe1-demo', async ({ command, ack, respond, say, client }) => {
   commandUserId = command.user_id;
   await ack();
   await respond({
@@ -62,6 +64,16 @@ app.command('/fe1-bot', async ({ command, ack, respond, say, client }) => {
             },
             value: 'url_list',
             action_id: 'url_list',
+          },
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: '슬랙 템플릿',
+              emoji: true,
+            },
+            value: 'slack_template',
+            action_id: 'slack_template',
           },
           // {
           //   type: 'button',
@@ -102,11 +114,12 @@ app.action('reject_pr', async ({ ack, respond }) => {
 app.action('url_list', handleSelectURLListProject);
 app.action(/^.*_url_list$/, handleGetURLs);
 
+// 슬랙 템플릿 액션
+app.action('slack_template', handleSelectSlackTemplate);
+app.action('cpo_bo_deploy', handleGetSlackTemplate);
+
 // 계정 목록 액션
 app.action('account_list', async ({ ack, respond }) => {});
-
-// 슬랙 템플릿 목록 액션
-app.action('slack_template', async ({ ack, respond }) => {});
 
 // Handle the Lambda function event
 export const handler = async (event: any, context: any, callback: any) => {

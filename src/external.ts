@@ -88,7 +88,7 @@ export const getLatestGitLabMR = async (projectId: string, token: string) => {
   }
 };
 
-export const getLatestCPODeployPage = async () => {
+export const getLatestCPODeployPages = async () => {
   try {
     const auth = {
       username: 'ssj@ignite.co.kr',
@@ -107,26 +107,59 @@ export const getLatestCPODeployPage = async () => {
       return null;
     }
 
-    const latestChildPageId = response.data.results[0].id;
-    const latestChildPageUrl = `https://ignitecorp.atlassian.net/wiki/rest/api/content/${latestChildPageId}/child/page`;
-    const childPageResponse = await axios.get(latestChildPageUrl, { auth });
+    // 최신 월 배포 관리 페이지 획득 (ex. Dev) 배포관리 - 2024-09)
+    const latestMonthPageId = response.data.results[0].id;
+    const latestMonthPageUrl = `https://ignitecorp.atlassian.net/wiki/rest/api/content/${latestMonthPageId}/child/page`;
+    const latestChildPageResponse = await axios.get(latestMonthPageUrl, {
+      auth,
+    });
+
+    const beforeLatestMonthPageId = response.data.results[1].id;
+    const beforeLatestMonthPageUrl = `https://ignitecorp.atlassian.net/wiki/rest/api/content/${beforeLatestMonthPageId}/child/page`;
+    const beforeChildPageResponse = await axios.get(beforeLatestMonthPageUrl, {
+      auth,
+    });
 
     if (
-      !childPageResponse?.data?.results ||
-      childPageResponse.data.results.length === 0
+      (!latestChildPageResponse?.data?.results ||
+        latestChildPageResponse.data.results.length === 0) &&
+      (!beforeChildPageResponse?.data?.results ||
+        beforeChildPageResponse.data.results.length === 0)
     ) {
       return null;
     }
 
-    const name = childPageResponse.data.results[0].title || '';
-    const webui = childPageResponse.data.results[0]._links?.webui || '';
-    const url = webui ? `https://ignitecorp.atlassian.net/wiki${webui}` : '';
+    // 최신 페이지 3개를 담을 배열 초기화
+    let pages = [];
 
-    if (!name || !url) {
-      return null;
+    // latestMonthPage 자식 페이지 추가
+    if (
+      latestChildPageResponse?.data?.results &&
+      latestChildPageResponse.data.results.length > 0
+    ) {
+      pages = latestChildPageResponse.data.results.slice(-3);
     }
 
-    return { name, url };
+    // beforeLatestMonthPage 자식 페이지 추가
+    if (beforeChildPageResponse?.data?.results && pages.length < 3) {
+      const remainingSlots = 3 - pages.length;
+      const beforePages = beforeChildPageResponse.data.results.slice(
+        -remainingSlots
+      );
+      pages = [...pages, ...beforePages];
+    }
+
+    // 반환할 페이지 정보 구성
+    const results = pages
+      .map((page: { title?: string; _links?: { webui?: string } }) => ({
+        name: page.title || '',
+        url: page._links?.webui
+          ? `https://ignitecorp.atlassian.net/wiki${page._links.webui}`
+          : '',
+      }))
+      .filter((page: { name?: string; url?: string }) => page.name && page.url);
+
+    return results.length > 0 ? results : null;
   } catch (e) {
     return null;
   }
